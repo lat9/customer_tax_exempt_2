@@ -63,7 +63,11 @@ class CustomerTaxExemptAdminObserver extends base
                           LIMIT 1"
                     );
                     $customers_tax_exempt = ($current_value->EOF) ? '' : $current_value->fields['customers_tax_exempt'];
-                    $field_value = htmlspecialchars($customers_tax_exempt, ENT_COMPAT, CHARSET, true);
+                    if (!empty($customers_tax_exempt)) { 
+                        $field_value = htmlspecialchars($customers_tax_exempt, ENT_COMPAT, CHARSET, true);
+                    } else {
+                        $field_value = ''; 
+                    }
                     $input_field = zen_draw_textarea_field('customers_tax_exempt', 'soft', '100%', '3', $field_value, 'class="noEditor form-control"');
                     
                     $tax_descriptions = $GLOBALS['db']->Execute("SELECT tax_description FROM " . TABLE_TAX_RATES);
@@ -77,6 +81,7 @@ class CustomerTaxExemptAdminObserver extends base
                     
                     $p2[] = array(
                         'label' => ENTRY_TAX_EXEMPT,
+                        'fieldname' => 'customers_tax_exempt', 
                         'input' => $input_field . $example
                     );
                 }
