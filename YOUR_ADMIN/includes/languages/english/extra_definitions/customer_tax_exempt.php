@@ -9,4 +9,4 @@
 // Copyright (c) 2019, Vinos de Frutas Tropicales
 //
 define('ENTRY_TAX_EXEMPT', 'Customer Tax Exempt');
-define('NOTES_TAX_EXEMPT', 'Either enter "ALL" if the customer is exempt from all taxes or copy/paste from the list of the store\'s current tax-descriptions (below), separated by commas.');
+define('NOTES_TAX_EXEMPT', 'Either enter "ALL" (without quotes) if the customer is exempt from all taxes or copy/paste from the list of the store\'s current tax-descriptions (below), separated by commas.');
