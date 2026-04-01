@@ -1,6 +1,6 @@
 <?php
 return [
-    'pluginVersion' => 'v3.0.0',
+    'pluginVersion' => 'v3.0.1',
     'pluginName' => 'Customer Tax Exempt',
     'pluginDescription' => 'This plugin enables an admin to indicate that a customer is exempt from taxes.',
     'pluginAuthor' => 'Vinos de Frutas Tropicales (lat9)',
