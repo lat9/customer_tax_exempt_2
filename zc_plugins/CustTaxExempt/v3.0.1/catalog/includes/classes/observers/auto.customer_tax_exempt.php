@@ -3,7 +3,7 @@
 // A simple observer-class that monitors customer-login actions and sets a session
 // variable to indicate whether/not the customer qualifies for a tax-exemption.
 //
-// Last updated: v3.0.0
+// Last updated: v3.0.1
 //
 use Zencart\Traits\ObserverManager;
 
@@ -84,11 +84,11 @@ class zcObserverCustomerTaxExempt
                 // If we got here, the customer is *not* exempt from some taxes.  Sum up the associated rates and
                 // set the override.
                 //
-                $tax_multiplier = 1;
+                $tax_multiplier = 1.0;
                 foreach ($tax_rates as $rate) {
-                    $tax_multiplier *= 1 + $rate['tax_rate_summed'] / 100;
+                    $tax_multiplier *= 1.0 + ($rate['tax_rate_summed'] / 100);
                 }
-                $p2 = ($tax_multiplier - 1) / 100;
+                $p2 = ($tax_multiplier - 1.0) * 100;
                 break;
 
             // -----
@@ -265,6 +265,7 @@ class zcObserverCustomerTaxExempt
               GROUP BY tr.tax_priority
               ORDER BY tr.tax_priority"
         );
+
         return $tax_info;
     }
 
