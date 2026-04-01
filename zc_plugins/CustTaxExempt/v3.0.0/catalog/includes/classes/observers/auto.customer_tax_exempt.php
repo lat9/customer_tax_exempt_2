@@ -3,13 +3,16 @@
 // A simple observer-class that monitors customer-login actions and sets a session
 // variable to indicate whether/not the customer qualifies for a tax-exemption.
 //
-// Last updated: v2.0.2
+// Last updated: v3.0.0
 //
-class TaxExemptCustomerObserver extends base
+use Zencart\Traits\ObserverManager;
+
+class zcObserverCustomerTaxExempt
 {
-    protected
-        $exemptions_list = '',
-        $exemptions_all = false;
+    use Zencart\Traits\ObserverManager;
+
+    protected string $exemptions_list = '';
+    protected bool $exemptions_all = false;
 
     // -----
     // Class constructor.
@@ -114,7 +117,7 @@ class TaxExemptCustomerObserver extends base
                 // which, if it contains data, identifies the tax(es) for which the partially-exempt customer
                 // is non-exempt!
                 //
-                $tax_rates = $this->getCustomersTaxRates($p1['class_id'], $p1['country_id'], $p1['zone_id']);
+                $tax_rates = $this->getCustomersTaxRates((int)$p1['class_id'], (int)$p1['country_id'], (int)$p1['zone_id']);
                 if ($tax_rates->EOF) {
                     $p2 = TEXT_UNKNOWN_TAX_RATE;
                     return;
@@ -157,7 +160,7 @@ class TaxExemptCustomerObserver extends base
                 // which, if it contains data, identifies the tax(es) for which the partially-exempt customer
                 // is non-exempt!
                 //
-                $tax_rates = $this->getCustomersTaxRates($p1['class_id'], $p1['country_id'], $p1['zone_id']);
+                $tax_rates = $this->getCustomersTaxRates((int)$p1['class_id'], (int)$p1['country_id'], (int)$p1['zone_id']);
                 if ($tax_rates->EOF) {
                     $p2 = [TEXT_UNKNOWN_TAX_RATE => 0];
                     return;
@@ -200,7 +203,7 @@ class TaxExemptCustomerObserver extends base
     // use in any tax calculations for the customer.  If the customer has no exemptions, the associated
     // tax-calculation notifications won't be attached!
     //
-    protected function initializeTaxExemptions()
+    protected function initializeTaxExemptions(): bool|string
     {
         global $db;
 
@@ -228,7 +231,7 @@ class TaxExemptCustomerObserver extends base
         return $exemption_status;
     }
 
-    protected function getCustomersTaxRatesSummed($tax_class_id, $country_id, $zone_id)
+    protected function getCustomersTaxRatesSummed(int $tax_class_id, int $country_id, int $zone_id): \queryFactoryResult
     {
         global $db;
 
@@ -240,15 +243,23 @@ class TaxExemptCustomerObserver extends base
             $zone_id = (int)$_SESSION['customer_zone_id'];
         }
 
+        if (!defined('TABLE_TAX_RATES_DESCRIPTION')) {
+            $extra_join = '';
+            $where_description = "tr.tax_description NOT IN ({$this->exemptions_list})";
+        } else {
+            $extra_join = "INNER JOIN " . TABLE_TAX_RATES_DESCRIPTION . " trd ON trd.tax_rates_id = tr.tax_rates_id AND trd.language_id = " . (int)$_SESSION['languages_id'];
+            $where_description = "trd.tax_description NOT IN ({$this->exemptions_list})";
+        }
         $tax_info = $db->Execute(
             "SELECT SUM(tax_rate) AS tax_rate_summed, tax_priority
               FROM " . TABLE_TAX_RATES . " tr
+                    $extra_join
                     LEFT JOIN " . TABLE_ZONES_TO_GEO_ZONES . " za
                         ON tr.tax_zone_id = za.geo_zone_id
                     LEFT JOIN " . TABLE_GEO_ZONES . " tz 
                         ON tz.geo_zone_id = tr.tax_zone_id
               WHERE tr.tax_class_id = $tax_class_id
-                AND tr.tax_description NOT IN ({$this->exemptions_list})
+                AND $where_description
                 AND (za.zone_country_id IS NULL OR za.zone_country_id = 0 OR za.zone_country_id = $country_id)
                 AND (za.zone_id IS NULL OR za.zone_id = 0 OR za.zone_id = $zone_id)
               GROUP BY tr.tax_priority
@@ -257,7 +268,7 @@ class TaxExemptCustomerObserver extends base
         return $tax_info;
     }
 
-    protected function getCustomersTaxRates($tax_class_id, $country_id, $zone_id)
+    protected function getCustomersTaxRates(int $tax_class_id, int $country_id, int $zone_id): \queryFactoryResult
     {
         global $db;
 
@@ -269,15 +280,24 @@ class TaxExemptCustomerObserver extends base
             $zone_id = (int)$_SESSION['customer_zone_id'];
         }
 
+        if (!defined('TABLE_TAX_RATES_DESCRIPTION')) {
+            $extra_join = '';
+            $where_description = "tr.tax_description NOT IN ({$this->exemptions_list})";
+        } else {
+            $extra_join = "INNER JOIN " . TABLE_TAX_RATES_DESCRIPTION . " trd ON trd.tax_rates_id = tr.tax_rates_id AND trd.language_id = " . (int)$_SESSION['languages_id'];
+            $where_description = "trd.tax_description NOT IN ({$this->exemptions_list})";
+        }
+
         $tax_info = $db->Execute(
             "SELECT tax_rate, tax_description, tax_priority
               FROM " . TABLE_TAX_RATES . " tr
+                    $extra_join
                     LEFT JOIN " . TABLE_ZONES_TO_GEO_ZONES . " za
                         ON tr.tax_zone_id = za.geo_zone_id
                     LEFT JOIN " . TABLE_GEO_ZONES . " tz 
                         ON tz.geo_zone_id = tr.tax_zone_id
               WHERE tr.tax_class_id = $tax_class_id
-                AND tr.tax_description NOT IN ({$this->exemptions_list})
+                AND $where_description
                 AND (za.zone_country_id IS NULL OR za.zone_country_id = 0 OR za.zone_country_id = $country_id)
                 AND (za.zone_id IS NULL OR za.zone_id = 0 OR za.zone_id = $zone_id)
               ORDER BY tr.tax_priority ASC"

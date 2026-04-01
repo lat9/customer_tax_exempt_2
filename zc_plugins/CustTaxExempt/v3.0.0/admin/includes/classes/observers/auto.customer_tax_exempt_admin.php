@@ -1,16 +1,20 @@
 <?php
 // -----
 // Part of the "Customer Tax-Exempt, v2" plugin by lat9
-// Copyright (c) 2019-2024, Vinos de Frutas Tropicales
+// Copyright (c) 2019-2026, Vinos de Frutas Tropicales
 //
-// Last updated: v2.0.2
+// Last updated: v3.0.0
 //
+use Zencart\Traits\ObserverManager;
+
 if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true) {
     die('Illegal Access');
 }
 
-class CustomerTaxExemptAdminObserver extends base
+class zcObserverCustomerTaxExemptAdmin
 {
+    use ObserverManager;
+
     public function __construct() 
     {
         $this->attach(
@@ -71,7 +75,11 @@ class CustomerTaxExemptAdminObserver extends base
                     $field_value = htmlspecialchars((string)$customers_tax_exempt, ENT_COMPAT, CHARSET, true);
                     $input_field = zen_draw_textarea_field('customers_tax_exempt', 'soft', '100%', '3', $field_value, 'class="noEditor form-control"');
 
-                    $tax_descriptions = $db->Execute("SELECT tax_description FROM " . TABLE_TAX_RATES);
+                    if (!defined('TABLE_TAX_RATES_DESCRIPTION')) {
+                        $tax_descriptions = $db->Execute("SELECT tax_description FROM " . TABLE_TAX_RATES . " ORDER BY tax_rates_id");
+                    } else {
+                        $tax_descriptions = $db->Execute("SELECT tax_description FROM " . TABLE_TAX_RATES_DESCRIPTION . " ORDER BY tax_rates_id, language_id");
+                    }
                     $examples = [];
                     foreach ($tax_descriptions as $description) {
                         $examples[] = $description['tax_description'];

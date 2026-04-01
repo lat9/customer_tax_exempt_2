@@ -31,7 +31,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                 "ALTER TABLE " . TABLE_CUSTOMERS . " ADD customers_tax_exempt TEXT"
             );
         } elseif (!$sniffer->field_type(TABLE_CUSTOMERS, 'customers_tax_exempt', 'text')) {
-            $this->executeInstallerSql((
+            $this->executeInstallerSql(
                 "ALTER TABLE " . TABLE_CUSTOMERS . " MODIFY customers_tax_exempt TEXT"
             );
         }

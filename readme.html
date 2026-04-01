@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Tax Exempt v2 for Zen Cart v1.5.6+</title>
+<title>Customer Tax Exempt v2 for Zen Cart v2.1.0+</title>
 
 <style>
 a, a:active, a:visited { color: #006666; text-decoration: none; }
@@ -37,58 +37,65 @@ td.none { font-weight: bold; text-align: center; padding-top: 10px; }
 
 <body>
 <a name="top" id="top"></a>
-<h1>Customer Tax Exempt v2, for Zen Cart v1.5.6+</h1>
-<h3>Version 2.0.2 by lat9, nikhilchaudhary70 and scottcwilson. <span class="smaller">Copyright &copy; 2019-2024, <a href="https://vinosdefrutastropicales.com" target="_blank">Vinos de Frutas Tropicales</a></span></h3>
-<p>Current Support Thread at Zen Cart Forums: <a href="https://www.zen-cart.com/showthread.php?225841-Customer-Tax-Exempt" target="_blank">https://www.zen-cart.com/showthread.php?225841-Customer-Tax-Exempt</a></p>
+<h1>Customer Tax Exempt v2, for Zen Cart v2.1.0+</h1>
+<h3>Version 3.0.0 by lat9, nikhilchaudhary70 and scottcwilson. <span class="smaller">Copyright &copy; 2019-2026, <a href="https://vinosdefrutastropicales.com" target="_blank">Vinos de Frutas Tropicales</a></span></h3>
+<p>Support Thread at Zen Cart Forums: <a href="https://www.zen-cart.com/showthread.php?225841-Customer-Tax-Exempt" target="_blank">https://www.zen-cart.com/showthread.php/225857-Customer-Tax-Exempt-v2-Support-Thread</a></p>
+<p>Zen Cart Plugins Download Link: <a href="https://www.zen-cart.com/downloads.php?do=file&id=2259" target="_blank">https://www.zen-cart.com/downloads.php?do=file&id=2259</a></p>
 
 <hr>
 <h2>What it does</h2>
-<p><em>Customer Tax Exempt v2</em> allows you to identify taxes from which your store's customers are exempt. Refer to the plugin's <a href="https://github.com/lat9/customer_tax_exempt_2/blob/master/readme.md" target="_blank">on-line documentation</a> for additional information.</p>
+<p>If you have customers that have tax-exempt status, this plugin enables your store's admins to identify the taxes (based on the associated <code>tax description</code>) from which the customer is exempt.</p>
+
+<p>Once you have installed (or upgraded) the plugin, a new data-entry field &mdash; <b>Customer Tax Exempt</b> &mdash; is available when a store admin views a customer's details via the <b>Customers  :: Customers</b> tab:</p>
+<img src="customers_tax_exempt_addition.jpg" alt="Addition to customer details">
+<ol>
+    <li>If that field is empty, the customer has <b>no</b> exemptions.</li>
+    <li>If that field is set to <b>ALL</b>, the customer is exempt from <em>all</em> taxes.</li>
+    <li>Otherwise, you identify _specific_ taxes from which the customer is exempt as a comma-separated list of tax-descriptions for your store.  The instructions below the field list the tax-descriptions currently defined for your store, making it easy to copy-and-paste the values.</li>
+</ol>
+
+<p>When a customer has tax-exemptions, the plugin's storefront additions monitor requests for tax-related information, e.g. tax-rates and tax-descriptions, and override the "normal" values based on the customer's tax-exempt status.</p>
 
 <hr>
 <h2>Installing and Upgrading</h2>
-<p>There are <b>no</b> <span class="corefile">core-file overwrites</span> in this plugin; however, you should <strong>always</strong> backup your store's database and files prior to making any changes.</p>
+<h3>Installation</h3>
+<p>Starting with v3.0.0, this is released as a Zen Cart <em>encapsulated plugin</em>, so installation (and removal) is simplified.</p>
 <ol>
-  <li>Rename /YOUR_ADMIN to match the name of your Zen Cart admin directory.</li>
-  <li>Upload the plugin's files to your store's file system:<ol type="a">
-    <li>/includes/auto_loaders/config.CustomerTaxExempt.php</li>
-    <li>/includes/classes/observers/TaxExemptCustomerObserver.php</li>
-    <li>/YOUR_ADMIN/includes/auto_loaders/config.customer_tax_exempt_admin.php</li>
-    <li>/YOUR_ADMIN/includes/classes/observers/CustomerTaxExemptAdminObserver.php</li>
-    <li>/YOUR_ADMIN/includes/init_includes/init_customer_tax_exempt_admin.php</li>
-    <li>/YOUR_ADMIN/includes/languages/english/extra_definitions/customer_tax_exempt.php</li>
-  </ol></li>
-  <li>Sign into your admin-console or, if you are already signed in, click the <em>Admin Home</em> link at the top of the page.</li>
+    <li><em>Merge</em> the plugin's <code>/zc_plugins</code> with your site's pre-existing <code>/zc_plugins</code> directory.</li>
+    <li>Log into your Zen Cart admin panel.</li>
+    <li>Use the admin menus, navigating to <em>Modules :: Plugin Manager</em>.</li>
+    <li>You'll see a plugin named <b>Customer Tax Exempt</b>; click the <em>Install</em> button for the plugin.  That's it!</li>
 </ol>
-
-<hr>
-<h2>Un-install</h2>
-<p>Delete the plugin's added files (see above) copied during the installation. Finally, run the <strong>/uninstall_customer_tax_exempt.sql</strong> to remove the plugin's database changes.</p>
+<h3>Uninstall</h3>
+<p>To uninstall the plugin, navigate to the admin's <em>Modules :: Plugin Manager</em>, find the line-item for <em>Customer Tax Exempt</em> and click the <em>Un-Install</em> button.</p>
 
 <hr>
 <h2>Version History:</h2>
 <ul>
-  <li>v2.0.2, 2024-04-25:<ul>
-    <li>BUGFIX: Correct MySQL 5.7+ error on storefront <code>GROUP BY</code> clause.</li>
-    <li>BUGFIX: Correct PHP Warning when customer's exemption status hasn't been supplied.</li>
-    <li>BUGFIX: Correct missing required value when editing a customer's record in the admin.</li>
-    <li>The following files were changed:<ol>
-        <li>/includes/classes/observers/TaxExemptCustomerObserver.php</li>
-        <li>/YOUR_ADMIN/includes/classes/observers/CustomerTaxExemptAdminObserver.php</li>
-        <li>/YOUR_ADMIN/includes/init_includes/init_customer_tax_exempt_admin.php</li>
-    </ol></li>
-  </ul></li>
-  <li>v2.0.1, 2021-04-29:<ul>
-    <li>BUGFIX: Correct MySQL error when customer has multiple exemptions.</li>
-    <li>BUGFIX: Guest customers aren't tax-exempt.</li>
-    <li>The following files were changed:<ol>
-        <li>/includes/classes/observers/TaxExemptCustomerObserver.php</li>
-        <li>/YOUR_ADMIN/includes/init_includes/init_customer_tax_exempt_admin.php</li>
-    </ol></li>
-  </ul></li>
-  <li>v2.0.0, 2019-08-31:<ul>
-    <li>Initial release.</li>
-  </ul></li>
+    <li>v3.0.0-beta1, 2026-04-01:<ul>
+        <li>CHANGE: Now distributed as a Zen Cart encapsulated plugin.</li>
+    </ul></li>
+    <li>v2.0.2, 2024-04-25:<ul>
+        <li>BUGFIX: Correct MySQL 5.7+ error on storefront <code>GROUP BY</code> clause.</li>
+        <li>BUGFIX: Correct PHP Warning when customer's exemption status hasn't been supplied.</li>
+        <li>BUGFIX: Correct missing required value when editing a customer's record in the admin.</li>
+        <li>The following files were changed:<ol>
+            <li>/includes/classes/observers/TaxExemptCustomerObserver.php</li>
+            <li>/YOUR_ADMIN/includes/classes/observers/CustomerTaxExemptAdminObserver.php</li>
+            <li>/YOUR_ADMIN/includes/init_includes/init_customer_tax_exempt_admin.php</li>
+        </ol></li>
+    </ul></li>
+    <li>v2.0.1, 2021-04-29:<ul>
+        <li>BUGFIX: Correct MySQL error when customer has multiple exemptions.</li>
+        <li>BUGFIX: Guest customers aren't tax-exempt.</li>
+        <li>The following files were changed:<ol>
+            <li>/includes/classes/observers/TaxExemptCustomerObserver.php</li>
+            <li>/YOUR_ADMIN/includes/init_includes/init_customer_tax_exempt_admin.php</li>
+        </ol></li>
+    </ul></li>
+    <li>v2.0.0, 2019-08-31:<ul>
+        <li>Initial release.</li>
+    </ul></li>
 </ul>
 </body>
 </html>
